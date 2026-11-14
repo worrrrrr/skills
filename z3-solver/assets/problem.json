@@ -1,0 +1,15 @@
+{
+  "timeout_ms": 20000,
+  "variables": {
+    "a": { "type": "int", "min": 0, "max": 9 },
+    "b": { "type": "int", "min": 0, "max": 9 },
+    "c": { "type": "int", "min": 0, "max": 9 }
+  },
+  "constraints": [
+    "a + b + c == 12",
+    "a > b",
+    "b > c",
+    { "all_different": ["a", "b", "c"] }
+  ],
+  "enumerate": 3
+}
