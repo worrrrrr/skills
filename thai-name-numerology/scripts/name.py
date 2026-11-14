@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Thai name numerology (เลขศาสตร์ชื่อ) for a name and surname.
 
+Supports Thai letters and the English letters A-Z mapped by the same table.
+
 Usage:
     python scripts/name.py --name "วรกฤช" --surname "สุนทรธรรมนิติ" --json
     python scripts/name.py --full "วรกฤช สุนทรธรรมนิติ"
-    python scripts/name.py --name "สมชาย" --md
+    python scripts/name.py --name "Somchai" --surname "Jaidee" --md
 
 Exit codes: 0 ok, 2 cannot read input, 3 usage/invalid input.
 """
@@ -14,6 +16,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from pathlib import Path
 
 # ค่าอักษรตามตำราเลขศาสตร์ (สายอาจารย์พลูหลวง) — พยัญชนะ + ฤ
 CONSONANT_VALUES = {
@@ -42,32 +45,33 @@ MARK_VALUES = {
 }
 ZERO_VALUES = {"ํ"}
 
-VERDICTS = {
-    1: "good", 2: "neutral", 3: "neutral", 4: "good", 5: "good",
-    6: "good", 7: "bad", 8: "bad", 9: "good", 11: "bad",
-    14: "good", 51: "good", 65: "good",
-}
+# ค่าอักษรอังกฤษตามตารางเดียวกัน (ตัวพิมพ์เล็ก/ใหญ่เท่ากัน)
+LATIN_VALUES = {}
+for _letters, _value in (
+    ("AIJQY", 1),
+    ("BKR", 2),
+    ("CGLS", 3),
+    ("DMT", 4),
+    ("EHNX", 5),
+    ("UVW", 6),
+    ("OZ", 7),
+    ("FP", 8),
+):
+    for _letter in _letters:
+        LATIN_VALUES[_letter] = _value
 
-MEANINGS = {
-    1: ("good", "ดาวอาทิตย์ — ความเชื่อมั่น ผู้นำ เด่นในสังคม แต่ระวังความหยิ่งทะนง"),
-    2: ("neutral", "ดาวจันทร์ — จินตนาการ อ่อนโยน มีเสน่ห์ แต่ใจหวั่นไหวและตัดสินใจยาก"),
-    3: ("neutral", "ดาวอังคาร — กล้าหาญ เด็ดเดี่ยว ชอบแข่งขัน แต่ระวังใจร้อนและอุบัติเหตุ"),
-    4: ("good", "ดาวพุธ — สติปัญญา ปฏิภาณ เจรจาเก่ง เอาตัวรอดด้วยปัญญา"),
-    5: ("good", "ดาวพฤหัสบดี — คุณธรรม ปัญญา ผู้ใหญ่อุปถัมภ์ ชีวิตมั่นคง"),
-    6: ("good", "ดาวศุกร์ — ศิลปะ รสนิยม การเงิน ความรัก มีคนช่วยเหลือ"),
-    7: ("bad", "ดาวเสาร์ — อดทน ฝ่าอุปสรรค เหนื่อยก่อนสำเร็จ"),
-    8: ("bad", "ดาวราหู — พลิกแพลง กล้าเสี่ยง ระวังมัวเมาและอบายมุข"),
-    9: ("good", "ดาวเกตุ — ลางสังหรณ์ ต่างประเทศ เรื่องลี้ลับ แคล้วคลาด"),
-    11: ("bad", "ความขัดแย้งในตัวเอง ดื้อรั้น ซ่อนความแข็งกร้าวใต้บุคลิกอ่อนโยน ชีวิตดิ้นรน"),
-    14: ("good", "สติปัญญาและมงคล ฉลาด มีตำแหน่งก้าวไกล ผู้คนเคารพ รักความยุติธรรม สำเร็จมาก"),
-    51: ("good", "รักความสมบูรณ์แบบ ปัญญาดี ผู้ใหญ่อำนวยโชค ระวังเข้มงวดจนตึงเครียด"),
-    65: ("good", "คู่ทรัพย์คู่โชค ราบรื่น ผู้ใหญ่สนับสนุน หาเงินเก่ง ความรักมั่นคง"),
-}
+MEANINGS_PATH = Path(__file__).resolve().parent.parent / "assets" / "meanings-0-100.json"
+try:
+    with MEANINGS_PATH.open(encoding="utf-8") as handle:
+        MEANINGS = {int(key): value for key, value in json.load(handle).items()}
+except (OSError, ValueError, json.JSONDecodeError) as error:
+    raise SystemExit(f"error: cannot load the meaning table {MEANINGS_PATH}: {error}") from error
 
 LABELS = {
     "good": "ให้คุณ",
     "neutral": "ปานกลาง",
     "bad": "ให้โทษ",
+    "special": "พิเศษ",
 }
 
 HELP = """Usage:
@@ -86,6 +90,8 @@ Options:
 5 ฉ ณ ฌ น ม ห ฮ ฎ ฬ / 6 จ ล ว อ / 7 ศ ส ซ / 8 ย พ ฟ ผ ฝ / 9 ฏ ฐ
 สระ-วรรณยุกต์: า ุ ำ ่=1, เ แ ู ้=2, ๋=3, ะ ิ โ ั=4, ึ=5, ใ=6,
 ี ื ๊=7, ็=8, ไ ์=9, ํ=0
+อักษรอังกฤษ: A I J Q Y=1, B K R=2, C G L S=3, D M T=4, E H N X=5,
+U V W=6, O Z=7, F P=8
 """
 
 
@@ -130,6 +136,8 @@ def letters(text: str) -> list[dict]:
             out.append({"char": char, "value": MARK_VALUES[char], "kind": "mark"})
         elif char in ZERO_VALUES:
             out.append({"char": char, "value": 0, "kind": "zero"})
+        elif char.upper() in LATIN_VALUES:
+            out.append({"char": char, "value": LATIN_VALUES[char.upper()], "kind": "latin"})
         else:
             out.append({"char": char, "value": 0, "kind": "unmapped"})
     return out
@@ -152,17 +160,20 @@ def part(text: str) -> dict:
         "chars": chars,
         "total": total,
         "reduced": reduce_number(total),
+        "verdict": verdict(total),
+        "meaning": meaning(total),
         "unmapped": [item["char"] for item in chars if item["kind"] == "unmapped"],
     }
 
 
 def verdict(number: int) -> str | None:
-    return VERDICTS.get(number)
+    item = MEANINGS.get(number)
+    return item["verdict"] if item else None
 
 
 def meaning(number: int) -> str | None:
     item = MEANINGS.get(number)
-    return item[1] if item else None
+    return item["meaning"] if item else None
 
 
 def summarize(name: str, surname: str) -> dict:
@@ -173,10 +184,12 @@ def summarize(name: str, surname: str) -> dict:
         "total": combined_total,
         "reduced": reduce_number(combined_total),
         "verdict": verdict(combined_total),
+        "meaning": meaning(combined_total),
+        "reduced_items": [
+            {"number": number, "verdict": verdict(number), "meaning": meaning(number)}
+            for number in reduce_number(combined_total)
+        ],
     }
-    for item in (name_part, surname_part):
-        if item is not None:
-            item["verdict"] = verdict(item["total"])
     return {
         "name": name_part,
         "surname": surname_part,
@@ -220,8 +233,11 @@ def md_report(data: dict) -> str:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     name, surname = split_input(args)
-    if not any(char in CONSONANT_VALUES or char in MARK_VALUES for char in name):
-        print("error: no Thai letters found in the name", file=sys.stderr)
+    if not any(
+        char in CONSONANT_VALUES or char in MARK_VALUES or char.upper() in LATIN_VALUES
+        for char in name
+    ):
+        print("error: no mapped Thai or English letters found in the name", file=sys.stderr)
         return 2
     data = summarize(name, surname)
     if args.md:

@@ -12,7 +12,7 @@ Six skills, each with a single job:
 | [`divination-charts`](divination-charts/SKILL.md) | Computes Thai, Bazi, Vedic, Western and Human Design charts from one birth record, with a deterministic Python engine and a Markdown/JSON report. | "ดูดวง", "Bazi", "ลัคนา", "Human Design", "อ่านดวง" |
 | [`reality-check`](reality-check/SKILL.md) | Stops guessing and verifies packages, versions, APIs, flags, config keys and URLs against registries or installed code before answering. | "does this package exist", "check the version", "verify this", "อย่าเดา", "เช็กก่อนตอบ" |
 | [`skill-creator`](skill-creator/SKILL.md) | Creates, scaffolds, lints and repairs Agent Skills against the open Agent Skills spec, including name/description rules and budget checks. | "create a skill", "validate skill", "lint skill", "สร้างสกิล", "ตรวจสกิล" |
-| [`thai-name-numerology`](thai-name-numerology/SKILL.md) | Maps a Thai name and surname to the traditional digit table, sums first name, surname and combined total, reduces the total and reads the meaning. | "วิเคราะห์ชื่อ", "เลขศาสตร์ชื่อ", "ตั้งชื่อ", "ตรวจชื่อ", "ชื่อมงคล" |
+| [`thai-name-numerology`](thai-name-numerology/SKILL.md) | Maps a Thai name and surname to the traditional digit table, sums first name, surname and combined total, reduces the total and reads the 0–100 meaning table. | "วิเคราะห์ชื่อ", "เลขศาสตร์ชื่อ", "ตั้งชื่อ", "ตรวจชื่อ", "ชื่อมงคล" |
 
 ## Install
 
