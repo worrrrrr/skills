@@ -19,6 +19,17 @@ allowed-tools: Read Write Edit Bash Glob Grep
 Turn a question about constraints into an SMT formula, let Z3 answer it, and prove the answer
 before you report it.
 
+## Requirements
+
+Python 3.11+ and the `z3-solver` package:
+
+```bash
+python -m pip install z3-solver
+```
+
+`lint` runs without z3. `doctor`, `run`, `solve` and `sudoku.py` exit 2 and print the install
+command until it is available. No other third-party package is used.
+
 ## When to use
 
 - A puzzle or assignment with rules: sudoku, logic grid, seating, timetabling.

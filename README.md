@@ -67,9 +67,12 @@ Expected output today: `6/6 skills pass`.
 
 ## Requirements
 
-- Python 3.11+ for the skill scripts (stdlib only, no installs).
+- Python 3.11+ for every skill script.
+- [`z3-solver`](https://pypi.org/project/z3-solver/) for the `z3-solver` skill:
+  `python -m pip install z3-solver`. Its `lint` runs without it; `doctor`, `run`, `solve` and
+  `sudoku.py` exit 2 until it is installed.
 - Node 18+ only for `reality-check/scripts/docs.mjs`, which fetches published docs.
-- No package manager, build step or dependencies for the skills themselves.
+- No package manager or build step; everything else is Python standard library.
 
 ## License
 
