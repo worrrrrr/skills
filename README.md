@@ -3,14 +3,16 @@
 A collection of Agent Skills for coding assistants: portable `SKILL.md` packages that load only
 when a task matches, then bring their own scripts, references and assets.
 
-Four skills, each with a single job:
+Six skills, each with a single job:
 
 | Skill | What it does | Fires when you say |
 |---|---|---|
 | [`decompose`](decompose/SKILL.md) | Turns vague or oversized work into atomic, verifiable tasks with a dependency DAG, critical path, parallel waves and acceptance criteria. Outputs `tasks.json` + `PLAN.md`. | "break this down", "WBS", "plan this refactor", "แยกงาน", "แตกงาน" |
 | [`design-review`](design-review/SKILL.md) | Chooses a token system (color, type, spacing, radius), builds composable layout classes and small components, supports runtime themes, and audits accessibility and copy. | "design this page", "design system", "check contrast", "ตรวจ UI", "ธีม" |
+| [`divination-charts`](divination-charts/SKILL.md) | Computes Thai, Bazi, Vedic, Western and Human Design charts from one birth record, with a deterministic Python engine and a Markdown/JSON report. | "ดูดวง", "Bazi", "ลัคนา", "Human Design", "อ่านดวง" |
 | [`reality-check`](reality-check/SKILL.md) | Stops guessing and verifies packages, versions, APIs, flags, config keys and URLs against registries or installed code before answering. | "does this package exist", "check the version", "verify this", "อย่าเดา", "เช็กก่อนตอบ" |
 | [`skill-creator`](skill-creator/SKILL.md) | Creates, scaffolds, lints and repairs Agent Skills against the open Agent Skills spec, including name/description rules and budget checks. | "create a skill", "validate skill", "lint skill", "สร้างสกิล", "ตรวจสกิล" |
+| [`thai-name-numerology`](thai-name-numerology/SKILL.md) | Maps a Thai name and surname to the traditional digit table, sums first name, surname and combined total, reduces the total and reads the meaning. | "วิเคราะห์ชื่อ", "เลขศาสตร์ชื่อ", "ตั้งชื่อ", "ตรวจชื่อ", "ชื่อมงคล" |
 
 ## Install
 
@@ -44,7 +46,7 @@ python skill-creator/scripts/lint.py design-review    # one skill
 python skill-creator/scripts/cli.py lint --strict .   # warnings fail
 ```
 
-Expected output today: `4/4 skills pass`.
+Expected output today: `6/6 skills pass`.
 
 ## Repository conventions
 
