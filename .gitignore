@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Dependencies
+node_modules/
+
+# Scratch app left behind when the repo became skills-only.
+# Its three native .node files stay locked until the holding process exits;
+# delete the folder after a restart: Remove-Item .app-locked -Recurse -Force
+.app-locked/
+
+# OS / editor
+.DS_Store
+Thumbs.db

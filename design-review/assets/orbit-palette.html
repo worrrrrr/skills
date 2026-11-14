@@ -1,0 +1,6 @@
+<!-- CommandPalette.svelte | extracted from harness-orbit.html | static markup: copy structure, then move colors/spacing to assets/tokens.css -->
+<div id="commandPaletteModal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-start justify-center pt-[14vh] p-4"
+ onclick="if(event.target===this) closeCommandPalette()"><div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden"><div class="px-4 py-3 border-b border-slate-200/80 dark:border-slate-800 flex items-center gap-2.5"><svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg><input id="paletteSearchInput" type="text" oninput="renderCommandPalette()"
+ onkeydown="if(event.key==='Escape') closeCommandPalette()"
+ placeholder="Type a command, switch view, or jump to session..."
+ class="flex-1 bg-transparent text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:outline-none" /><kbd class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-400">ESC</kbd></div><div id="paletteResultsList" class="max-h-72 overflow-y-auto p-1.5 space-y-0.5 text-xs"></div></div></div>
