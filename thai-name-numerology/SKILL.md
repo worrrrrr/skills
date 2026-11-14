@@ -55,11 +55,13 @@ Do not romanize, do not "fix" a name, and do not add a middle name the user did 
 ### 2. Calculate
 
 ```bash
-python scripts/name.py --name "วรกฤช" --surname "สุนทรธรรมนิติ" --json
+python scripts/name.py "วรกฤช สุนทรธรรมนิติ"
 ```
 
-- `--full "ชื่อ นามสกุล"` splits at the first space.
-- `--md` prints a ready report.
+- One quoted string is enough: the first word is the name, the rest is the surname.
+- `--name` + `--surname` and `--full` still work for scripts that already use them.
+- `--md` prints a ready report; add `--detail` to append the long prose from
+  `references/meaning.md` for every number in the result.
 - Requires Python 3.11+, standard library only.
 - Exit `0` ok, `2` no mapped letters, `3` usage.
 
@@ -83,8 +85,11 @@ bad.
 
 - Show the letter-by-letter sum for the first name and surname (one line each).
 - Give the verdict — ให้คุณ / ปานกลาง / ให้โทษ — only when the table records it.
-- Quote a meaning only from `references/meanings-0-100.md` (0–100); if the total is above 100,
-  give the number and point to the 1–109 source table instead of inventing a reading.
+- Quote the short summary from the CLI output (`assets/meanings-0-100.json`) or use the long-form
+  INFJ 5w4 readings in `references/meaning.md`; if the total is above 100, give the number and
+  point to the 1–109 source table instead of inventing a reading.
+- The INFJ 5w4 lens is an interpretation, not a personality test: describe it as a way of
+  reading the number, never as a diagnosis of the person.
 - Keep it short: three numbers, one meaning each, then a two-sentence synthesis.
 
 ### 5. State the limits
@@ -112,9 +117,8 @@ characters (notably ไม้ตรี = 7, ํ = 0, and some versions put ฎ/�
 ## Progressive disclosure
 
 - `references/table.md` — the complete digit table, edge characters, and source links.
-- `references/meanings-0-100.md` — generated table of verdicts and meanings for 0–100.
-- `assets/meanings-0-100.json` — source data for the 0–100 meanings.
+- `references/meaning.md` — long-form INFJ 5w4 readings for 0–100 (one file).
+- `assets/meanings-0-100.json` — short verdict and summary data for 0–100.
 - `assets/report-template.md` — a three-number report skeleton.
 - `scripts/name.py` — the calculator (import `summarize`/`letters` for other tools).
-- `scripts/render_meanings.py` — regenerate the 0–100 reference from the JSON asset.
 - `scripts/selftest.py` — regression checks; run after editing the table.

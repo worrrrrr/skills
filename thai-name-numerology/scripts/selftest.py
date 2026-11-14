@@ -2,7 +2,7 @@
 """Regression checks for name.py. Run: python scripts/selftest.py"""
 from __future__ import annotations
 
-from name import MEANINGS, letters, meaning, reduce_number, summarize, verdict
+from name import MEANINGS, letters, load_detail, meaning, reduce_number, summarize, verdict
 
 checks = 0
 
@@ -50,5 +50,10 @@ check(bool(meaning(0)), "0 has a meaning")
 check(bool(meaning(100)), "100 has a meaning")
 check(data["combined"]["reduced_items"][1]["number"] == 11, "reduced item 11")
 check(data["combined"]["reduced_items"][2]["number"] == 2, "reduced item 2")
+
+detail = load_detail()
+check(set(detail) == set(range(0, 101)), "detail covers 0-100")
+check(bool(detail[14]["text"]), "14 has detail text")
+check(bool(detail[100]["title"]), "100 has a title")
 
 print(f"selftest: {checks} checks passed")

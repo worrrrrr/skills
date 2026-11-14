@@ -4,9 +4,9 @@
 Supports Thai letters and the English letters A-Z mapped by the same table.
 
 Usage:
-    python scripts/name.py --name "วรกฤช" --surname "สุนทรธรรมนิติ" --json
-    python scripts/name.py --full "วรกฤช สุนทรธรรมนิติ"
-    python scripts/name.py --name "Somchai" --surname "Jaidee" --md
+    python scripts/name.py "วรกฤช สุนทรธรรมนิติ"
+    python scripts/name.py "วรกฤช สุนทรธรรมนิติ" --md
+    python scripts/name.py --name "Somchai" --surname "Jaidee" --json
 
 Exit codes: 0 ok, 2 cannot read input, 3 usage/invalid input.
 """
@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -61,6 +62,8 @@ for _letters, _value in (
         LATIN_VALUES[_letter] = _value
 
 MEANINGS_PATH = Path(__file__).resolve().parent.parent / "assets" / "meanings-0-100.json"
+DETAIL_DIR = Path(__file__).resolve().parent.parent / "references"
+DETAIL_PATH = DETAIL_DIR / "meaning.md"
 try:
     with MEANINGS_PATH.open(encoding="utf-8") as handle:
         MEANINGS = {int(key): value for key, value in json.load(handle).items()}
@@ -75,13 +78,15 @@ LABELS = {
 }
 
 HELP = """Usage:
-  python scripts/name.py --name "วรกฤช" --surname "สุนทรธรรมนิติ" [--json|--md]
-  python scripts/name.py --full "วรกฤช สุนทรธรรมนิติ" [--json|--md]
+  python scripts/name.py "ชื่อ นามสกุล" [--json|--md]
+  python scripts/name.py --name "ชื่อ" --surname "นามสกุล" [--json|--md]
+  python scripts/name.py --full "ชื่อ นามสกุล" [--json|--md]
 
 Options:
+  text        ชื่อและนามสกุลในสตริงเดียว (แนะนำ)
   --name      ชื่อ (อาจไม่มีนามสกุล)
   --surname   นามสกุล
-  --full      ชื่อและนามสกุลในสตริงเดียว คั่นด้วยช่องว่าง
+  --full      ชื่อและนามสกุลในสตริงเดียว (แบบเดิม)
   --json      พิมพ์ JSON (ค่าเริ่มต้น)
   --md        พิมพ์รายงาน Markdown
   --help      แสดงวิธีใช้
@@ -104,15 +109,26 @@ class Parser(argparse.ArgumentParser):
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = Parser(description="Thai name numerology (เลขศาสตร์ชื่อ).")
+    parser.add_argument("text", nargs="?", help="ชื่อและนามสกุลในสตริงเดียว")
     parser.add_argument("--name", help="ชื่อ")
     parser.add_argument("--surname", help="นามสกุล")
-    parser.add_argument("--full", help="ชื่อและนามสกุลในสตริงเดียว")
+    parser.add_argument("--full", help="ชื่อและนามสกุลในสตริงเดียว (แบบเดิม)")
     parser.add_argument("--json", action="store_true", help="print JSON (default)")
     parser.add_argument("--md", action="store_true", help="print a Markdown report")
+    parser.add_argument("--detail", action="store_true", help="add the long prose from references/meaning.md (with --md)")
     return parser.parse_args(argv)
 
 
 def split_input(args: argparse.Namespace) -> tuple[str, str]:
+    if args.text:
+        if args.name or args.surname or args.full:
+            print("error: use the positional text or --name/--surname/--full, not both", file=sys.stderr)
+            raise SystemExit(3)
+        parts = args.text.split()
+        if not parts:
+            print("error: the name is empty", file=sys.stderr)
+            raise SystemExit(3)
+        return parts[0], " ".join(parts[1:])
     if args.full:
         parts = args.full.split()
         if not parts:
@@ -120,7 +136,7 @@ def split_input(args: argparse.Namespace) -> tuple[str, str]:
             raise SystemExit(3)
         return parts[0], " ".join(parts[1:])
     if not args.name:
-        print("error: pass --name (and optionally --surname) or --full", file=sys.stderr)
+        print("error: pass the name as text, or --name (and optionally --surname)", file=sys.stderr)
         raise SystemExit(3)
     return args.name.strip(), (args.surname or "").strip()
 
@@ -176,6 +192,40 @@ def meaning(number: int) -> str | None:
     return item["meaning"] if item else None
 
 
+def load_detail() -> dict[int, dict]:
+    """Read references/meaning-*.md into {number: {title, text}}."""
+    paths = sorted(DETAIL_DIR.glob("meaning-*.md"))
+    if not paths:
+        paths = [DETAIL_PATH]
+    out: dict[int, dict] = {}
+    for path in paths:
+        if not path.exists():
+            continue
+        lines = path.read_text(encoding="utf-8").splitlines()
+        for index, line in enumerate(lines):
+            match = re.match(r"^\s*เลข\s+(\d+)\s*$", line)
+            if not match:
+                continue
+            number = int(match.group(1))
+            title = ""
+            for previous in range(index - 1, -1, -1):
+                if lines[previous].strip():
+                    title = lines[previous].strip()
+                    break
+            paragraph = []
+            for following in range(index + 1, len(lines)):
+                text = lines[following].strip()
+                if not text:
+                    if paragraph:
+                        break
+                    continue
+                if re.match(r"^\s*เลข\s+\d+\s*$", text):
+                    break
+                paragraph.append(text)
+            out[number] = {"title": title, "text": " ".join(paragraph)}
+    return out
+
+
 def summarize(name: str, surname: str) -> dict:
     name_part = part(name)
     surname_part = part(surname) if surname else None
@@ -203,7 +253,7 @@ def summarize(name: str, surname: str) -> dict:
     }
 
 
-def md_report(data: dict) -> str:
+def md_report(data: dict, detail: dict[int, dict] | None = None) -> str:
     lines = ["# Name numerology (เลขศาสตร์ชื่อ)", ""]
     name = data["name"]
     surname = data["surname"]
@@ -226,6 +276,20 @@ def md_report(data: dict) -> str:
     unmapped = sorted(set(name["unmapped"] + (surname["unmapped"] if surname else [])))
     if unmapped:
         lines += ["", f"> อักษรที่ตารางไม่กำหนดค่า: {' '.join(unmapped)} (นับ 0)"]
+    if detail:
+        numbers = [name["total"]]
+        if surname:
+            numbers.append(surname["total"])
+        numbers.append(data["combined"]["total"])
+        numbers += data["combined"]["reduced"][1:]
+        lines += ["", "## รายละเอียด"]
+        seen = set()
+        for number in numbers:
+            if number in seen or number not in detail:
+                continue
+            seen.add(number)
+            item = detail[number]
+            lines += ["", f"### {number} — {item['title']}", item["text"]]
     lines += ["", "> เป็นความเชื่อเชิงตำราตามหลักเลขศาสตร์ไทย เพื่อความบันเทิง ไม่ใช่คำทำนายตายตัว"]
     return "\n".join(lines)
 
@@ -239,9 +303,12 @@ def main(argv: list[str] | None = None) -> int:
     ):
         print("error: no mapped Thai or English letters found in the name", file=sys.stderr)
         return 2
+    if args.detail and not args.md:
+        print("error: use --detail together with --md", file=sys.stderr)
+        return 3
     data = summarize(name, surname)
     if args.md:
-        print(md_report(data))
+        print(md_report(data, load_detail() if args.detail else None))
     else:
         print(json.dumps(data, ensure_ascii=False, indent=2))
     return 0
