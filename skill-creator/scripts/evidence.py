@@ -65,13 +65,15 @@ def write_report(output: Path, results: list[dict], root: Path) -> dict:
         "h1{margin-top:0}.meta{color:#536170}table{border-collapse:collapse;width:100%;margin:24px 0}",
         "th,td{padding:12px;text-align:left;border-bottom:1px solid #e5e9ef}th{background:#f1f4f8}",
         ".passed{color:#137333;font-weight:700}.failed{color:#b3261e;font-weight:700}",
-        ".not_tested,.unverified{color:#8a5200;font-weight:700}.note{padding:14px;background:#fff7e6;border:1px solid #f0d79b;border-radius:8px}</style>",
+        ".not_tested,.unverified{color:#8a5200;font-weight:700}.note{padding:14px;background:#fff7e6;border:1px solid #f0d79b;border-radius:8px}",
+        "details{margin:12px 0;border:1px solid #e5e9ef;border-radius:8px;padding:12px}summary{cursor:pointer;font-weight:650}",
+        "pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f5f7fa;padding:12px;border-radius:6px;max-height:420px;overflow:auto}</style>",
         "</head><body><main><h1>Skill execution evidence</h1>",
         "<p class='meta'>Run: " + html.escape(report["run_at"]) + " · Python " + html.escape(report["python"]) + "</p>",
         "<p>Passed: " + str(counts["PASSED"]) + " · Failed: " + str(counts["FAILED"]) +
         " · Not tested: " + str(counts["NOT_TESTED"]) + " · Unverified: " + str(counts["UNVERIFIED"]) + "</p>",
         "<table><thead><tr><th>Skill</th><th>Status</th><th>Exit code</th><th>Duration</th><th>Notes</th></tr></thead>",
-        "<tbody>" + "".join(rows) + "</tbody></table>",
+        "<tbody>" + "".join(rows) + "</tbody></table><h2>Captured execution output</h2>" + "".join(output_sections),
         "<p class='note'><strong>Scope limitation:</strong> This report proves only the bundled self-tests ran. ",
         "It does not prove that an AI agent discovered, activated, or followed each SKILL.md in a live host.</p>",
         "</main></body></html>"
