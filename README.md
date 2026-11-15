@@ -77,3 +77,16 @@ Expected output today: `6/6 skills pass`.
 ## License
 
 MIT, as declared in each `SKILL.md`.
+
+
+## Execution evidence
+
+Every skill must provide evidence from a real execution, not just documentation or a lint
+result. The GitHub Actions workflow runs each bundled `scripts/selftest.py`, records raw
+stdout/stderr and machine-readable results, captures a report screenshot, and uploads the
+evidence as a workflow artifact. See
+[`skill-creator/references/evidence-standard.md`](skill-creator/references/evidence-standard.md).
+
+The current runner verifies bundled script tests only. Live agent-host discovery, activation,
+and behavior require separate host-specific integration tests; they must not be marked verified
+until those tests have actually run.
