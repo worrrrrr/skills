@@ -141,6 +141,13 @@ workflow once with a real request, including every script command.
 
 Verify the tooling itself with `python scripts/selftest.py` after changing either script.
 
+## Phase 8 - Attach execution evidence
+
+Before calling a skill tested or verified, follow `references/evidence-standard.md`.
+Use the repository workflow to execute bundled self-tests and capture the generated report.
+Distinguish static checks, script tests, live host activation, and behavior verification.
+Never treat a lint pass or a generated screenshot as proof of live agent behavior.
+
 ## Naming rules
 
 | Rule | Invalid | Valid |
@@ -174,4 +181,5 @@ Verify the tooling itself with `python scripts/selftest.py` after changing eithe
 - `references/descriptions.md` - writing descriptions that trigger, with examples.
 - `references/authoring-workflow.md` - deciding, splitting, scripts vs instructions.
 - `references/checklist.md` - pre-publish checklist mapped to linter codes.
+- `references/evidence-standard.md` - evidence levels, capture requirements and release claims.
 - `references/landscape.md` - what skills exist publicly today and which archetypes win.
