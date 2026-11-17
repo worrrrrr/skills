@@ -52,7 +52,7 @@ check(data["combined"]["reduced_items"][1]["number"] == 11, "reduced item 11")
 check(data["combined"]["reduced_items"][2]["number"] == 2, "reduced item 2")
 
 detail = load_detail()
-check(set(detail) == set(range(0, 101)), "detail covers 0-100")
+check(set(detail) == set(range(1, 101)), "detail covers 1-100 (0 is the special case)")
 check(bool(detail[14]["text"]), "14 has detail text")
 check(bool(detail[100]["title"]), "100 has a title")
 

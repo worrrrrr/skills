@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "categories": [
+    { "id": "meta", "label": "Agent & skill tooling", "order": 10 },
+    { "id": "workflow", "label": "How work starts and plans", "order": 20 },
+    { "id": "verification", "label": "Evidence about the world", "order": 30 },
+    { "id": "formal", "label": "Solvers & formal methods", "order": 40 },
+    { "id": "ui", "label": "Design & front-end", "order": 50 },
+    { "id": "divination", "label": "Culture-bound reading systems", "order": 60 }
+  ]
+}

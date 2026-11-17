@@ -1,4 +1,4 @@
----
+﻿---
 name: thai-name-numerology
 description: >-
   Calculates Thai name numerology (เลขศาสตร์ชื่อ) from a name and surname: maps every
@@ -11,6 +11,8 @@ license: MIT
 metadata:
   version: "1.0.0"
   tags: "numerology, thai, names, onomastics, divination"
+  category: "divination"
+  tier: "domain"
 allowed-tools: Read Write Edit Bash Glob Grep
 ---
 

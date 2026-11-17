@@ -203,15 +203,16 @@ def load_detail() -> dict[int, dict]:
             continue
         lines = path.read_text(encoding="utf-8").splitlines()
         for index, line in enumerate(lines):
-            match = re.match(r"^\s*เลข\s+(\d+)\s*$", line)
+            match = re.search(r"เลข\s+(\d+)\s*$", line)
             if not match:
                 continue
             number = int(match.group(1))
-            title = ""
-            for previous in range(index - 1, -1, -1):
-                if lines[previous].strip():
-                    title = lines[previous].strip()
-                    break
+            title = line[: match.start()].strip()
+            if not title:
+                for previous in range(index - 1, -1, -1):
+                    if lines[previous].strip():
+                        title = lines[previous].strip()
+                        break
             paragraph = []
             for following in range(index + 1, len(lines)):
                 text = lines[following].strip()
@@ -219,7 +220,7 @@ def load_detail() -> dict[int, dict]:
                     if paragraph:
                         break
                     continue
-                if re.match(r"^\s*เลข\s+\d+\s*$", text):
+                if re.search(r"เลข\s+\d+\s*$", text):
                     break
                 paragraph.append(text)
             out[number] = {"title": title, "text": " ".join(paragraph)}

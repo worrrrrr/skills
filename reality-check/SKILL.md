@@ -1,4 +1,4 @@
----
+﻿---
 name: reality-check
 description: >-
   Stops the agent from guessing and makes it verify package names, versions, APIs,
@@ -13,6 +13,8 @@ license: MIT
 metadata:
   version: "1.0.0"
   tags: "verification, hallucination, packages, registry, dependencies"
+  category: "verification"
+  tier: "core"
 allowed-tools: Read Write Edit Bash Glob Grep
 ---
 

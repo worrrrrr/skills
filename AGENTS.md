@@ -19,15 +19,22 @@ output or node_modules here. Scratch work belongs outside the repo.
 ## After you change anything
 
 ```bash
-python skill-creator/scripts/cli.py doctor .         # all skills, must stay 4/4 pass
+python skill-creator/scripts/guard.py .              # whole collection: layout, catalog, triggers, selftests
+python skill-creator/scripts/cli.py doctor .         # all skills, must report 0 errors and 0 warnings
 python skill-creator/scripts/lint.py <skill>         # one skill while iterating
 ```
 
 Fix every error. Fix or justify every warning. A skill that has not been linted is not finished.
+`guard.py` runs every bundled selftest, so a red test fails the collection even when lint is clean.
 
 ## Layout rules
 
-- Only these folders go inside a skill: `references/`, `scripts/`, `assets/`.
+- Only these folders go inside a skill: `references/`, `scripts/`, `assets/`. A stray file at a
+  skill root (`PLAN.md`, `tasks.json`, demo output) is an `E_STRAY` error - move it under
+  `assets/` or delete it.
+- Every skill declares `metadata.category` (a kebab-case id from `catalog.json`) and
+  `metadata.tier` (`core`, `specialist`, `product` or `domain`). Categories live in
+  `catalog.json`; never create a category folder or list skill names there.
 - Nothing nests deeper than one level below `SKILL.md`; `assets/templates/x.html` triggers
   warning W010, so flatten to `assets/x.html` or prefix filenames.
 - Paths written in `SKILL.md` are relative to the skill directory. The agent's shell runs in the

@@ -1,4 +1,4 @@
----
+﻿---
 name: skill-creator
 description: >-
   Creates, scaffolds, audits and repairs Agent Skills (SKILL.md packages) that follow the
@@ -12,6 +12,8 @@ license: MIT
 metadata:
   version: "1.0.0"
   tags: "skills, authoring, meta, agentskills"
+  category: "meta"
+  tier: "core"
 allowed-tools: Read Write Edit Bash Glob Grep
 ---
 
@@ -120,6 +122,7 @@ python scripts/lint.py .            # report for the current skill
 python scripts/cli.py lint ..       # same, through the one CLI
 python scripts/cli.py fix ..        # create missing referenced files, then lint
 python scripts/cli.py doctor ..     # audit every skill under a folder
+python scripts/guard.py ..          # whole collection: layout, catalog, triggers, selftests
 python scripts/lint.py ../my-skill --strict   # warnings fail the build
 python scripts/lint.py ../my-skill --json     # machine-readable
 python scripts/lint.py --list-codes           # every diagnostic explained
@@ -165,6 +168,9 @@ Verify the tooling itself with `python scripts/selftest.py` after changing eithe
 ## Files
 
 - `scripts/lint.py` - spec, reference and script validator.
+- `scripts/guard.py` - collection gate: layout, catalog, README index, trigger collisions,
+  cross-skill references, duplicated rules, deprecated APIs inside language-tagged code
+  fences, bundled selftests.
 - `scripts/cli.py` - one entry point: `new`, `lint`, `fix` (resume a half-finished skill), `doctor`.
 - `scripts/new.py` - scaffold a compliant skill directory.
 - `scripts/selftest.py` - regression test for both scripts.

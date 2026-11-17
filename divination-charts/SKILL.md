@@ -1,4 +1,4 @@
----
+﻿---
 name: divination-charts
 description: >-
   Computes five birth-chart systems from one birth record — Thai (วันเกิด, ราศี,
@@ -11,6 +11,8 @@ license: MIT
 metadata:
   version: "1.0.0"
   tags: "divination, astrology, bazi, vedic, human-design, thai"
+  category: "divination"
+  tier: "domain"
 allowed-tools: Read Write Edit Bash Glob Grep
 ---
 

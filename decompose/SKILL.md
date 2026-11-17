@@ -1,4 +1,4 @@
----
+﻿---
 name: decompose
 description: >-
   Decomposes complex, vague, or oversized work into atomic, verifiable tasks with an
@@ -12,6 +12,8 @@ license: MIT
 metadata:
   version: "1.0.0"
   tags: "planning, decomposition, wbs, dag, estimation, project-management"
+  category: "workflow"
+  tier: "core"
 allowed-tools: Read Write Edit Bash Glob Grep
 ---
 

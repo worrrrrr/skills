@@ -1,4 +1,4 @@
----
+﻿---
 name: z3-solver
 description: >-
   Encodes constraint, scheduling, configuration and verification problems as SMT formulas,
@@ -11,6 +11,8 @@ license: MIT
 metadata:
   version: "1.0.0"
   tags: "smt, z3, constraints, verification, scheduling, optimization"
+  category: "formal"
+  tier: "specialist"
 allowed-tools: Read Write Edit Bash Glob Grep
 ---
 

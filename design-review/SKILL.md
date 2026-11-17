@@ -1,4 +1,4 @@
----
+﻿---
 name: design-review
 description: >-
   Designs and audits UI for SvelteKit and web apps: chooses a token system (colour, type,
@@ -13,6 +13,8 @@ license: MIT
 metadata:
   version: "1.0.0"
   tags: "design, ui, ux, sveltekit, tailwind, tokens, a11y"
+  category: "ui"
+  tier: "product"
 allowed-tools: Read Write Edit Bash Glob Grep
 ---
 
@@ -99,7 +101,7 @@ python scripts/audit.py src --tokens src/layout.css             # labels, alt, t
 python scripts/selftest.py                                      # the tools themselves
 ```
 
-Then the project's own checks: `verify.py` (svelte-check/build) after any component change.
+Then the project's own checks: `svelte-check` and the build after any component change.
 Numbers to report: contrast ratios, audit codes fixed, and what was removed.
 
 ## Phase 5 - Copy

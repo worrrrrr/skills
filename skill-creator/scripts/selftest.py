@@ -20,6 +20,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 LINT = HERE / "lint.py"
 NEW = HERE / "new.py"
+GUARD = HERE / "guard.py"
 
 GOOD = """---
 name: demo-skill
@@ -95,6 +96,40 @@ def make_skill(root: Path, name: str, text: str, files: dict[str, str] | None = 
     return skill
 
 
+def collection_skill(name: str, trigger: str, body: str = "",
+                     desc: str | None = None) -> str:
+    description = desc or (f"Demo skill {name} for the guard test. "
+                           f'Triggers include "{trigger}".')
+    return f"""---
+name: {name}
+description: >-
+  {description}
+license: MIT
+metadata:
+  version: "1.0"
+  category: "meta"
+  tier: "core"
+---
+
+# {name}
+
+{body}
+"""
+
+
+def guard_json(root: Path, *extra: str) -> tuple[int, dict]:
+    result = run([sys.executable, str(GUARD), str(root), "--json", "--no-selftest", *extra])
+    try:
+        payload = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        payload = {"issues": [], "raw": result.stdout + result.stderr}
+    return result.returncode, payload
+
+
+def guard_codes(payload: dict) -> set[str]:
+    return {item["code"] for item in payload.get("issues", []) if item["level"] == "ERROR"}
+
+
 def main() -> int:
     failures: list[str] = []
     checks = 0
@@ -145,6 +180,78 @@ def main() -> int:
         code, payload = lint_json(base / "scaffold-demo")
         if code != 0:
             failures.append(f"scaffolded skill should pass, got {payload.get('errors')}")
+
+        # --- collection guard -------------------------------------------------
+        repo = base / "collection"
+        repo.mkdir()
+        make_skill(repo, "alpha", collection_skill(
+            "alpha", "alpha run",
+            desc='Formats quarterly reports into the house template and checks every section. '
+                 'Use when a report needs formatting. Triggers include "alpha run".'))
+        make_skill(repo, "beta", collection_skill(
+            "beta", "beta run",
+            desc='Schedules nightly batch jobs and pages the on-call channel when one fails. '
+                 'Use when a cron entry needs a schedule. Triggers include "beta run".'))
+        (repo / "README.md").write_text(
+            "| Skill | What |\n|---|---|\n"
+            "| [`alpha`](alpha/SKILL.md) | a |\n| [`beta`](beta/SKILL.md) | b |\n",
+            encoding="utf-8",
+        )
+
+        checks += 1
+        code, payload = guard_json(repo)
+        if "E_CATALOG" not in guard_codes(payload):
+            failures.append(f"a collection without catalog.json must report E_CATALOG, got {sorted(guard_codes(payload))}")
+
+        (repo / "catalog.json").write_text(json.dumps(
+            {"version": 1, "categories": [{"id": "meta", "label": "Meta", "order": 10}]}), encoding="utf-8")
+
+        checks += 1
+        code, payload = guard_json(repo, "--strict")
+        if code != 0:
+            failures.append(f"clean collection should pass --strict, got {sorted(guard_codes(payload))}")
+
+        checks += 1
+        (repo / "alpha" / "PLAN.md").write_text("stray\n", encoding="utf-8")
+        code, payload = guard_json(repo)
+        if "E_STRAY" not in guard_codes(payload):
+            failures.append(f"a stray file at a skill root must report E_STRAY, got {sorted(guard_codes(payload))}")
+        (repo / "alpha" / "PLAN.md").unlink()
+
+        checks += 1
+        (repo / "beta" / "scripts").mkdir()
+        (repo / "beta" / "scripts" / "tool.py").write_text("print('x')\n", encoding="utf-8")
+        (repo / "alpha" / "SKILL.md").write_text(
+            collection_skill("alpha", "alpha run", "Run `tool.py` before reporting."), encoding="utf-8")
+        code, payload = guard_json(repo)
+        if "E_CROSS_REF" not in guard_codes(payload):
+            failures.append(f"a bare foreign script reference must report E_CROSS_REF, got {sorted(guard_codes(payload))}")
+
+        checks += 1
+        (repo / "alpha" / "SKILL.md").write_text(
+            collection_skill("alpha", "beta run"), encoding="utf-8")
+        code, payload = guard_json(repo)
+        if "E_TRIGGER" not in guard_codes(payload):
+            failures.append(f"a shared trigger phrase must report E_TRIGGER, got {sorted(guard_codes(payload))}")
+
+        checks += 1
+        (repo / "alpha" / "SKILL.md").write_text(
+            collection_skill("alpha", "alpha run",
+                             body="```svelte\n<button on:click={go}>x</button>\n```"),
+            encoding="utf-8")
+        code, payload = guard_json(repo)
+        if "E_DEPRECATED" not in guard_codes(payload):
+            failures.append(f"deprecated API in a tagged code fence must report E_DEPRECATED, "
+                            f"got {sorted(guard_codes(payload))}")
+
+        checks += 1
+        (repo / "alpha" / "SKILL.md").write_text(
+            collection_skill("alpha", "alpha run",
+                             body="```\nscan output: onclick={fn} not on:click\n```"),
+            encoding="utf-8")
+        code, payload = guard_json(repo)
+        if "E_DEPRECATED" in guard_codes(payload):
+            failures.append("an untagged fence is sample output and must not report E_DEPRECATED")
 
     for failure in failures:
         print(f"FAIL  {failure}")
